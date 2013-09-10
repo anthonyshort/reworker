@@ -26,8 +26,14 @@ program.parse(process.argv);
 
 // Load the config file
 
-var file = join(process.cwd(), program.config || './rework.js');
-var config = require(file);
+try {
+  var file = join(process.cwd(), program.config || './rework.js');
+  var config = require(file);
+}
+catch(e) {
+  console.error('No rework.js file found');
+  process.exit(1);
+}
 
 
 // Process stdin, run the config, output to stdout
