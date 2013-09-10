@@ -23,8 +23,8 @@ helps by having built-in support for minifying CSS. It's sort of like a `Gruntfi
 Let's say you have a `styles.css` file. Add a `rework.js` file next to it:
 
 ```js
-module.exports = function(rework) {
-  return rework;
+module.exports = function(css, rework) {
+  return css;
 };
 ```
 
