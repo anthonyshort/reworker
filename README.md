@@ -3,19 +3,24 @@ reworker
 
 Simple way to use Rework with a Grunt-like config
 
-```
-npm install -g reworker
-```
-
 * Easily rework your CSS using a CLI
 * Use a Grunt-like config to add middleware to Rework
 * Built-in support for minifying CSS
 * Supports css-whitespace
 * Build variants for various browsers (usually just oldIE)
 
+## Get it
+
+```
+npm install -g reworker
+```
+
 ## Usage
 
-Add a `rework.js` file to your CSS project:
+Reworker creates a Rework instance for you from stdin, passes this to a config, and then writes to stdout. It also
+helps by having built-in support for minifying CSS. It's sort of like a `Gruntfile.js`.
+
+Let's say you have a `styles.css` file. Add a `rework.js` file next to it:
 
 ```js
 module.exports = function(rework) {
@@ -29,10 +34,21 @@ Then run reworker:
 reworker < styles.css > build.css
 ```
 
-Reworker takes input via stdin and outputs via stdout. 
+By default, this config isn't doing much. But now you can load up some Rework
+plugins in that config and `rework.use` them. You have access to all of the 
+built-in Rework plugins, like `references`, `inline`, `mixin` etc.
 
-By default, this config isn't doing much, but it is passed a built Rework instances
-ready for you to you.
+## Variants
+
+You can pass a variant to reworker:
+
+```
+reworker -v ie < style.css
+```
+
+This can be accessed via `rework.variant` from within the config. This lets
+you change the middleware options that are used based on any variant so you
+can have multiple builds. This could include mobile versions, retina versions etc.
 
 ## Options
 
@@ -57,16 +73,6 @@ module.exports = function(rework) {
 
   // Replace variables in the CSS
   rework.use(vars(variables));
-
-  // You could put this in its own module
-  // and access it with your normal JS too.
-  var breakpoints = {
-    '(min-width: 20rem)': {
-      name: 'mobile',
-      columns: 4,
-      spacing: ['0', '10px', '20px', '40px']
-    }
-  };
 
   // Declare mixins
   // These are simple properties that are replaced
@@ -93,18 +99,6 @@ module.exports = function(rework) {
       return (n * variables.baseline) + 'px';
     }
   }));
-
-  // Allow inlining of images using inline()
-  rework.use(rework.inline('./'));
-
-  // Extra easing functions
-  rework.use(rework.ease());
-
-  // rgba(hex, n)
-  rework.use(rework.colors());
-
-  // Reference other properties from within a selector
-  rework.use(rework.references());
 
   // Retina background images
   if(options.variant !== 'ie8') {
