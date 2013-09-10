@@ -1,0 +1,14 @@
+{
+  "name": "reworker",
+  "author": "Anthony Short",
+  "version": "0.0.1",
+  "dependencies": {
+    "clean-css": "~1.0.7",
+    "css-whitespace": "~1.1.0",
+    "commander": "~1.1.1",
+    "stdin": "0.0.1"
+  },
+  "bin": {
+    "reworker": "./bin/reworker"
+  }
+}
