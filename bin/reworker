@@ -4,28 +4,33 @@ var program = require('commander'),
     rework = require('rework'),
     whitespace = require('css-whitespace'),
     minify = require('clean-css').process,
+    path = require('path'),
+    join = path.join,
     stdin = require('stdin');
 
-function noConfig(rework) {
-  return rework;
-}
+
+// Usage
 
 program
+  .version(require('../package').version)
   .option('--variant <name>', 'build a variant')
-  .option('-c', '--config <file>', 'path to the rework config', './rework.js')
+  .option('-c', '--config <file>', 'path to the rework config')
   .option('--minify', 'compress the CSS output')
   .option('-s', '--whitespace', 'parse CSS through css-whitespace');
 
+
+// Parse the CLI arguemtns
+
 program.parse(process.argv);
 
-var config;
 
-try {
-  config = require(program.config);
-}
-catch(e) {
-  config = noConfig;
-}
+// Load the config file
+
+var file = join(process.cwd(), program.config || './rework.js');
+var config = require(file);
+
+
+// Process stdin, run the config, output to stdout
 
 stdin(function(css){
 
@@ -34,15 +39,8 @@ stdin(function(css){
   }
 
   var style = rework(css);
-
-  style.variant = program.variant
-
-  // Access to all built-in rework plugins
-  for(var key in rework) {
-    style[key] = rework;
-  }
-
-  style = config(style);
+  style.variant = program.variant;
+  style = config(style, rework);
 
   var compiled = style.toString();
 
