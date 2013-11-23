@@ -3,6 +3,9 @@
 var program = require('commander'),
     rework = require('rework'),
     whitespace = require('css-whitespace'),
+    path = require('path'),
+    fs = require('fs'),
+    exists = fs.existsSync || path.existsSync,
     minify = require('clean-css').process,
     path = require('path'),
     join = path.join,
@@ -15,6 +18,7 @@ program
   .version(require('../package').version)
   .option('--variant <name>', 'build a variant')
   .option('-c', '--config <file>', 'path to the rework config')
+  .option('--use <module>', 'use a rework module')
   .option('--minify', 'compress the CSS output')
   .option('-s', '--whitespace', 'parse CSS through css-whitespace');
 
@@ -22,18 +26,6 @@ program
 // Parse the CLI arguemtns
 
 program.parse(process.argv);
-
-
-// Load the config file
-
-try {
-  var file = join(process.cwd(), program.config || './rework.js');
-  var config = require(file);
-}
-catch(e) {
-  console.error('No rework.js file found');
-  process.exit(1);
-}
 
 
 // Process stdin, run the config, output to stdout
@@ -46,7 +38,22 @@ stdin(function(css){
 
   var style = rework(css);
   style.variant = program.variant;
-  style = config(style, rework);
+
+  if(program.config) {
+    var file = join(process.cwd(), program.config);
+    var config = require(file);
+    style.use(config);
+  }
+
+  if (program.use) {
+    var modules = program.use.split(',');
+    modules.forEach(function(mod){
+      var resolved = path.resolve(mod);
+      var real = exists(resolved) || exists(resolved + '.js');
+      var module = path.resolve('node_modules', mod);
+      style.use(real ? require(resolved) : require(module));
+    });
+  }
 
   var compiled = style.toString();
 
