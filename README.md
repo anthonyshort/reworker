@@ -4,7 +4,7 @@ reworker
 Simple way to use Rework with a Grunt-like config. It's kind of like middleware for CSS.
 
 * Easily rework your CSS using a CLI
-* Use a Grunt-like config to add middleware to Rework
+* Load npm modules like rework-pure-css
 * Built-in support for minifying CSS
 * Supports css-whitespace
 * Build variants for various browsers (usually just oldIE)
@@ -18,79 +18,17 @@ npm install -g reworker
 ## Usage
 
 Reworker creates a Rework instance for you from stdin, passes this to a config, and then writes to stdout. It also
-helps by having built-in support for minifying CSS. It's sort of like a `Gruntfile.js`.
-
-Let's say you have a `styles.css` file. Add a `rework.js` file next to it:
-
-```js
-module.exports = function(css, rework) {
-  return css;
-};
-```
-
-Then run reworker:
+helps by having built-in support for minifying CSS. 
 
 ```
 reworker < styles.css > build.css
 ```
 
 By default, this config isn't doing much. But now you can load up some Rework
-plugins in that config and `rework.use` them.
-
-### Example: Autoprefixer
+plugins:
 
 ```
-var autoprefixer = require('autoprefixer');
-
-module.exports = function(css){
-  css.use(autoprefixer.rework(["last 2 versions"]));
-  return css;
-};
-```
-
-### Example: Rework built-ins
-
-You can use the plugins that come bundled with Rework:
-
-```
-module.exports = function(css, rework){
-  css.use(rework.inline('./'));
-  css.use(rework.ease());
-  css.use(rework.colors());
-  css.use(rework.references());
-  return css;
-};
-```
-
-### Example: Mixins/Custom Properties
-
-You can use the `rework.mixin` function to create custom properties:
-
-```js
-module.exports = function(css, rework){
-  css.use(rework.mixin({
-    'border-top-radius': function(val) {
-      return {
-        'border-top-left-radius': val,
-        'border-top-right-radius': val
-      };
-    }
-  }));
-};
-```
-
-### Example: Custom Functions
-
-You can use the `rework.function` method to define custom CSS functions
-
-```js
-module.exports = function(css, rework){
-  css.use(rework.function({
-    'baseline': function(n) {
-      return (n * variables.baseline) + 'px';
-    }
-  }));
-};
+reworker --use rework-pure-css < styles.css > build.css
 ```
 
 ## Variants
@@ -115,7 +53,7 @@ if(css.variant === "ie") {
 
 Run `reworker -h` for a list of options
 
-## Example Usage
+## Example Rework Module
 
 ```js
 var autoprefixer = require('autoprefixer'),
